@@ -9,5 +9,6 @@
 		"**/node_modules": true,
 		"**/dist": true
 	},
-	"explorerExclude.backup": {}
+	"explorerExclude.backup": {},
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false
 }
