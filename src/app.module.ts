@@ -18,6 +18,8 @@ export class AppModule {
     this.emailService.init().catch(() => {
       process.exit(1);
     });
-    this.matrixService.startClient();
+    this.matrixService.startClient().catch(() => {
+      process.exit(1);
+    });
   }
 }
