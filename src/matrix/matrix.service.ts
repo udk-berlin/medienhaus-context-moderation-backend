@@ -7,13 +7,14 @@ import {
   MatrixEvent,
   RoomEvent,
 } from 'matrix-js-sdk';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class MatrixService {
   private readonly logger = new ConsoleLogger(MatrixService.name);
   private client: MatrixClient = null;
 
-  constructor() {
+  constructor(private readonly emailService: EmailService) {
     this.logger.log('Initializing client');
     this.client = sdk.createClient({
       baseUrl: process.env.MATRIX_SERVER_URL,
@@ -35,18 +36,50 @@ export class MatrixService {
     }
   }
 
-  handleRoomEvent(event: MatrixEvent) {
+  async handleRoomEvent(event: MatrixEvent) {
     const roomId = event.getRoomId();
     const eventType = event.getType();
     const content = event.getContent();
+    const sender = event.getSender();
+    const stateKey = event.getStateKey();
+    const ts = event.getTs();
 
     switch (eventType) {
       case 'm.room.member':
         if (content.membership === 'knock') {
           // TODO: get emails of room moderators
-          // TODO: send email
+          const room = this.client.getRoom(roomId);
+          this.emailService.sendEmail(
+            process.env.TEST_EMAIL_RECIPIENT,
+            'knock event',
+            `${content.displayname} (${sender}) knocked on room ${room.name} (${roomId})`,
+          );
         }
         break;
+
+      case 'm.space.child':
+        // `content` is empty when a child has been removed, and non-empty when s.th. was added
+        if (Object.keys(content || {}).length) {
+          // added
+          const room = this.client.getRoom(roomId);
+
+          const addedRoomId = stateKey;
+          // this returns `null` due to the bot not being in the added room(?)
+          // TODO: find workaround
+          const addedRoom = this.client.getRoom(addedRoomId);
+          const addedRoomName = addedRoom?.name || '(UNKNOWN)';
+
+          const { displayname } = await this.client.getProfileInfo(sender);
+          this.emailService.sendEmail(
+            process.env.TEST_EMAIL_RECIPIENT,
+            'content added',
+            `${displayname} (${sender}) added room ${addedRoomName} (${roomId}) to ${room.name} (${roomId})`,
+          );
+        } else {
+          // removed
+        }
+        break;
+
       default:
         break;
     }
@@ -55,9 +88,9 @@ export class MatrixService {
     console.log(`New event in room ${roomId}:`);
     console.log(`Event type: ${eventType}`);
     console.log(`Event content:`, content);
-    console.log(event.getSender());
-    console.log(event.getStateKey());
-    console.log(event.getTs());
+    console.log(`Event sender:`, sender);
+    console.log(`Event state key:`, stateKey);
+    console.log(`Event ts:`, ts);
   }
 
   async startClient(): Promise<MatrixClient> {
