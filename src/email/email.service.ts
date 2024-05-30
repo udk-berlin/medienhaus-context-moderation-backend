@@ -1,11 +1,12 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import Mail from 'nodemailer/lib/mailer';
+import { FileLoggerService } from 'src/file-logger/file-logger.service';
 
 @Injectable()
 export class EmailService {
-  private logger = new ConsoleLogger(EmailService.name);
+  private logger = new FileLoggerService(EmailService.name);
   private transportOptions: SMTPTransport.Options;
   private transporter: nodemailer.Transporter;
 

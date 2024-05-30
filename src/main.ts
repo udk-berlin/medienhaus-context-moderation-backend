@@ -1,11 +1,13 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { FileLoggerService } from './file-logger/file-logger.service';
 
 async function bootstrap() {
+  const logger = new FileLoggerService('bootstrap');
+  logger.log('#####################################################');
+
   const app = await NestFactory.create(AppModule);
 
-  const logger = new Logger('bootstrap');
   logger.log('CONFIGURATION --------');
   logger.log(`PORT: ${process.env.PORT}`);
   logger.log(`MATRIX_SERVER_URL: ${process.env.MATRIX_SERVER_URL}`);

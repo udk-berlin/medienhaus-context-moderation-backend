@@ -1,4 +1,4 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as sdk from 'matrix-js-sdk';
 import {
   ClientEvent,
@@ -8,10 +8,11 @@ import {
   RoomEvent,
 } from 'matrix-js-sdk';
 import { EmailService } from 'src/email/email.service';
+import { FileLoggerService } from 'src/file-logger/file-logger.service';
 
 @Injectable()
 export class MatrixService {
-  private readonly logger = new ConsoleLogger(MatrixService.name);
+  private readonly logger = new FileLoggerService(MatrixService.name);
   private client: MatrixClient = null;
 
   constructor(private readonly emailService: EmailService) {
@@ -97,7 +98,7 @@ export class MatrixService {
     await this.login();
 
     return new Promise((resolve, reject) => {
-      this.client.once(ClientEvent.Sync, (state, prevState, res) => {
+      this.client.once(ClientEvent.Sync, (state /* , prevState, res */) => {
         if (state === 'PREPARED') {
           this.logger.log('Sync complete');
 
@@ -107,7 +108,7 @@ export class MatrixService {
 
           resolve(this.client);
         } else {
-          this.logger.error('Sync failed!', 'state:', state);
+          this.logger.error(`Sync failed! state: ${state}`);
           reject('Initial sync failed');
         }
       });
