@@ -1,3 +1,4 @@
+import * as fs from 'node:fs';
 import { Injectable } from '@nestjs/common';
 import * as sdk from 'matrix-js-sdk';
 import {
@@ -36,6 +37,14 @@ export class MatrixService {
     }
   }
 
+  writeLastSeenEventTimestamp(ts: number) {
+    try {
+      fs.writeFileSync(process.env.LAST_SEEN_EVENT_TS_FILE, ts.toString());
+    } catch (err) {
+      this.logger.error(`Failed to write last handled event timestamp: ${err}`);
+    }
+  }
+
   async handleRoomEvent(event: MatrixEvent) {
     const roomId = event.getRoomId();
     const eventType = event.getType();
@@ -51,6 +60,8 @@ export class MatrixService {
     console.log(`Event sender:`, sender);
     console.log(`Event state key:`, stateKey);
     console.log(`Event ts:`, ts);
+
+    this.writeLastSeenEventTimestamp(ts);
 
     switch (eventType) {
       case 'm.room.member':

@@ -12,6 +12,7 @@ async function bootstrap() {
   logger.log('CONFIGURATION --------');
   logger.log(`PORT: ${process.env.PORT}`);
   logger.log(`MATRIX_SERVER_URL: ${process.env.MATRIX_SERVER_URL}`);
+  logger.log(`LAST_SEEN_EVENT_TS_FILE: ${process.env.LAST_SEEN_EVENT_TS_FILE}`);
   logger.log('----------------------');
   logger.log(`Running on http://localhost:${process.env.PORT}`);
 
