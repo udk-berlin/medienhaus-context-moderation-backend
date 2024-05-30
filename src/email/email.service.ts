@@ -32,7 +32,7 @@ export class EmailService {
       await this.verifyTransporter();
       return this.transporter;
     } catch (err) {
-      this.logger.error(err);
+      this.logger.error(`Failed to create nodemailer transporter: ${err}`);
       throw err;
     }
   }
@@ -50,6 +50,10 @@ export class EmailService {
       text: content,
       html: undefined, // TODO: implement
     };
-    return this.transporter.sendMail(opts);
+    try {
+      return this.transporter.sendMail(opts);
+    } catch (err) {
+      this.logger.error(`Failed to send email: ${err}`);
+    }
   }
 }

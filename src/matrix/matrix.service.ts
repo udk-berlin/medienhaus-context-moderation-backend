@@ -13,7 +13,7 @@ import { FileLoggerService } from 'src/file-logger/file-logger.service';
 @Injectable()
 export class MatrixService {
   private readonly logger = new FileLoggerService(MatrixService.name);
-  private client: MatrixClient = null;
+  private readonly client: MatrixClient;
 
   constructor(private readonly emailService: EmailService) {
     this.logger.log('Initializing client');
@@ -31,8 +31,7 @@ export class MatrixService {
       );
       this.client.setAccessToken(res.access_token);
     } catch (err) {
-      console.error('Matrix login failed:');
-      console.log(err);
+      this.logger.error(`Matrix login failed: ${err}`);
       process.exit(1);
     }
   }
@@ -45,15 +44,28 @@ export class MatrixService {
     const stateKey = event.getStateKey();
     const ts = event.getTs();
 
+    console.log('#######################################');
+    console.log(`New event in room ${roomId}:`);
+    console.log(`Event type: ${eventType}`);
+    console.log(`Event content:`, content);
+    console.log(`Event sender:`, sender);
+    console.log(`Event state key:`, stateKey);
+    console.log(`Event ts:`, ts);
+
     switch (eventType) {
       case 'm.room.member':
         if (content.membership === 'knock') {
-          // TODO: get emails of room moderators
           const room = this.client.getRoom(roomId);
+
+          this.logger.log(
+            `${eventType}: ${content.displayname} (${sender}) knocked on room ${room.name} (${roomId})`,
+          );
+
+          // TODO: get emails of room moderators
           this.emailService.sendEmail(
             process.env.TEST_EMAIL_RECIPIENT,
             'knock event',
-            `${content.displayname} (${sender}) knocked on room ${room.name} (${roomId})`,
+            `${content.displayname}(${sender}) knocked on room ${room.name}(${roomId})`,
           );
         }
         break;
@@ -61,7 +73,7 @@ export class MatrixService {
       case 'm.space.child':
         // `content` is empty when a child has been removed, and non-empty when s.th. was added
         if (Object.keys(content || {}).length) {
-          // added
+          // room added
           const room = this.client.getRoom(roomId);
 
           const addedRoomId = stateKey;
@@ -71,27 +83,24 @@ export class MatrixService {
           const addedRoomName = addedRoom?.name || '(UNKNOWN)';
 
           const { displayname } = await this.client.getProfileInfo(sender);
+
+          this.logger.log(
+            `${eventType}: ${displayname}(${sender}) added room ${addedRoomName}(${roomId}) to ${room.name}(${roomId})`,
+          );
+
           this.emailService.sendEmail(
             process.env.TEST_EMAIL_RECIPIENT,
             'content added',
-            `${displayname} (${sender}) added room ${addedRoomName} (${roomId}) to ${room.name} (${roomId})`,
+            `${displayname}(${sender}) added room ${addedRoomName}(${roomId}) to ${room.name}(${roomId})`,
           );
         } else {
-          // removed
+          // room removed
         }
         break;
 
       default:
         break;
     }
-
-    console.log('#######################################');
-    console.log(`New event in room ${roomId}:`);
-    console.log(`Event type: ${eventType}`);
-    console.log(`Event content:`, content);
-    console.log(`Event sender:`, sender);
-    console.log(`Event state key:`, stateKey);
-    console.log(`Event ts:`, ts);
   }
 
   async startClient(): Promise<MatrixClient> {
