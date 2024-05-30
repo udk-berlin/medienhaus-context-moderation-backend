@@ -1,8 +1,8 @@
-import { ConsoleLogger, Injectable, LoggerService } from '@nestjs/common';
+import { ConsoleLogger, LoggerService } from '@nestjs/common';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 
-@Injectable()
+// @Injectable()
 export class FileLoggerService implements LoggerService {
   private readonly consoleLogger: ConsoleLogger;
   private readonly fileLogger: winston.Logger;

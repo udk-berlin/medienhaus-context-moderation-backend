@@ -7,6 +7,7 @@ async function bootstrap() {
   logger.log('#####################################################');
 
   const app = await NestFactory.create(AppModule);
+  app.enableShutdownHooks();
 
   logger.log('CONFIGURATION --------');
   logger.log(`PORT: ${process.env.PORT}`);
@@ -16,4 +17,5 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT);
 }
+
 bootstrap();
