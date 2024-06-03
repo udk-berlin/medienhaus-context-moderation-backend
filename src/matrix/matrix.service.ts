@@ -77,7 +77,7 @@ export class MatrixService {
           this.emailService.sendEmail(
             process.env.TEST_EMAIL_RECIPIENT,
             'knock event',
-            `${content.displayname}(${sender}) knocked on room ${room.name}(${roomId})`,
+            `${content.displayname} (${sender}) knocked on room ${room.name} (${roomId})`,
           );
         }
         break;
@@ -97,13 +97,13 @@ export class MatrixService {
           const { displayname } = await this.client.getProfileInfo(sender);
 
           this.logger.log(
-            `${eventType}: ${displayname}(${sender}) added room ${addedRoomName}(${roomId}) to ${room.name}(${roomId})`,
+            `${eventType}: ${displayname} (${sender}) added room ${addedRoomName} (${roomId}) to ${room.name} (${roomId})`,
           );
 
           this.emailService.sendEmail(
             process.env.TEST_EMAIL_RECIPIENT,
             'content added',
-            `${displayname}(${sender}) added room ${addedRoomName}(${roomId}) to ${room.name}(${roomId})`,
+            `${displayname} (${sender}) added room ${addedRoomName}(${roomId}) to ${room.name} (${roomId})`,
           );
         } else {
           // room removed
