@@ -61,6 +61,7 @@ export class MatrixService {
     console.log(`Event state key:`, stateKey);
     console.log(`Event ts:`, ts);
 
+    // keep track of when we last handled an event
     this.writeLastSeenEventTimestamp(ts);
 
     switch (eventType) {
