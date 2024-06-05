@@ -1,0 +1,64 @@
+name: '⚠️‼️ deploy_prod → cms-mail-notification-backend.rundgang.udk-berlin.de'
+
+on:
+  #push:
+  #  branches: [ "main" ]
+  #pull_request:
+  #  branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: The branch, tag or SHA to checkout
+        required: true
+        default: 'main'
+
+jobs:
+  deploy_prod:
+    runs-on: ubuntu-latest
+
+    env:
+      ssh_user: 'root'
+      ssh_host: 'cms-mail-notification-backend.rundgang.udk-berlin.de'
+      ssh_key: ${{ secrets.SSH_RUNDGANG_UDK_BERLIN_DE }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - run: mkdir -p ~/.ssh/
+      - run: echo "$ssh_key" > ~/.ssh/private.key
+      - run: chmod 600 ~/.ssh/private.key
+      - run: |
+          cat > ~/.ssh/config << EOF
+          Host remote
+            HostName $ssh_host
+            User $ssh_user
+            IdentityFile ~/.ssh/private.key
+            StrictHostKeyChecking no
+          EOF
+
+      - name: Run rsync to securely copy the build directory to the remote host
+        run: |
+          rsync \
+            --archive \
+            --compress \
+            --delete \
+            --exclude=.env \
+            --rsh="ssh -i ~/.ssh/private.key" \
+            --progress \
+            --verbose \
+            . \
+            remote:/opt/cms-mail-notification-backend/
+
+      #- run: ssh remote 'cd /opt/cms-mail-notification-backend/ && npm clean-install && npm run build --if-present && systemctl restart cms-mail-notification-backend.service'
+
+      - name: Stop the systemd service
+        run: ssh remote 'systemctl stop cms-mail-notification-backend.service'
+
+      - name: Install the nodejs project
+        run: ssh remote 'cd /opt/cms-mail-notification-backend/ && npm clean-install && npm run build --if-present'
+
+      - name: Start the systemd service
+        run: ssh remote 'systemctl start cms-mail-notification-backend.service'
+
