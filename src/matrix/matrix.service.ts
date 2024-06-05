@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Injectable } from '@nestjs/common';
 import * as sdk from 'matrix-js-sdk';
 import {
@@ -17,7 +18,11 @@ import {
   KnockAcceptedCallback,
   KnockEvent,
 } from './types';
-import { getRoomIdsByModUser, groupAndSortEvents } from './utils';
+import {
+  getFilteredEvents,
+  getRoomIdsByModUser,
+  groupAndSortEvents,
+} from './utils';
 import { KnownMembership } from 'matrix-js-sdk/lib/types';
 
 const UNKNOWN = '(UNKNOWN)';
@@ -51,12 +56,30 @@ export class MatrixService {
         if (state === 'PREPARED') {
           this.logger.log('Sync complete');
 
-          // TODO: get all events that happened after `this.lastDigestDate`, and queue them
-
           // start listening for events
           this.client.on(RoomEvent.Timeline, (event) =>
             this.handleRoomEvent(event, knockAcceptedCallback),
           );
+
+          // get all events that happened after the latest digest, and queue them
+          const ts = this.dataService.getLastDigestDate().getTime();
+          const rooms = this.client.getRooms();
+          for (const room of rooms) {
+            const stateEvents = room.currentState.events;
+            const memberEvents = getFilteredEvents(
+              stateEvents,
+              'm.room.member',
+              ts,
+            );
+            const childEvents = getFilteredEvents(
+              stateEvents,
+              'm.space.child',
+              ts,
+            );
+            [...memberEvents, ...childEvents].forEach((event) => {
+              this.handleRoomEvent(event, knockAcceptedCallback);
+            });
+          }
 
           // start interval to periodically process the queued events
           this.logger.log('Starting digest interval');
@@ -97,7 +120,7 @@ export class MatrixService {
     }
   }
 
-  async handleRoomEvent(
+  private async handleRoomEvent(
     event: MatrixEvent,
     knockAcceptedCallback: KnockAcceptedCallback,
   ) {
