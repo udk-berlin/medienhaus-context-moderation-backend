@@ -5,7 +5,8 @@ Medienhaus CMS email notification system
 
 ## Configuration
 
-Rename `.env-example` to `.env` and edit es needed.
+- Rename `.env-example` to `.env` and edit as needed
+- Create `spaces-export.json` with moderator email address lookup data
 
 
 ## Installation

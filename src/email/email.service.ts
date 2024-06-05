@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import Mail from 'nodemailer/lib/mailer';
-import { FileLoggerService } from 'src/file-logger/file-logger.service';
+import { FileLoggerService } from '../file-logger/file-logger.service';
 
 @Injectable()
 export class EmailService {
@@ -10,22 +10,8 @@ export class EmailService {
   private transportOptions: SMTPTransport.Options;
   private transporter: nodemailer.Transporter;
 
-  constructor() {
-    this.transportOptions = {
-      host: process.env.EMAIL_SERVER,
-      port: parseInt(process.env.EMAIL_SERVER_PORT, 10),
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-      // activate for debugging:
-      // debug: true,
-      // logger: true,
-    };
-  }
-
-  async init() {
+  async init(transportOptions: SMTPTransport.Options) {
+    this.transportOptions = transportOptions;
     try {
       this.logger.log('Creating nodemailer transporter');
       this.transporter = nodemailer.createTransport(this.transportOptions);
@@ -48,12 +34,12 @@ export class EmailService {
       to: address,
       subject,
       text: content,
-      html: undefined, // TODO: implement
     };
     try {
+      this.logger.log(`Sending email to ${address}`);
       return this.transporter.sendMail(opts);
     } catch (err) {
-      this.logger.error(`Failed to send email: ${err}`);
+      this.logger.error(`Failed to send email to ${address}: ${err}`);
     }
   }
 }
