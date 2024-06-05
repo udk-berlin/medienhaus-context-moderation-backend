@@ -25,6 +25,7 @@ import {
   knockEventAcceptedMessage,
   signature,
 } from './email/utils';
+import { LookUpEntry } from './data/types';
 
 @Module({
   imports: [ConfigModule.forRoot()],
@@ -34,6 +35,7 @@ export class AppModule implements OnApplicationShutdown {
   private readonly logger = new FileLoggerService(MatrixService.name);
 
   constructor(
+    private readonly dataService: DataService,
     private readonly emailService: EmailService,
     private readonly matrixService: MatrixService,
   ) {
@@ -62,15 +64,18 @@ export class AppModule implements OnApplicationShutdown {
       process.exit(1);
     });
 
-    const getEmailAddressForUserId = (userId: string) => {
+    const getEmailAddressForUserId = (
+      userId: string,
+      lookupData: LookUpEntry[],
+    ) => {
       if (isTestMode) {
         return process.env.TEST_EMAIL_RECIPIENT;
       }
 
-      let emailAddress = lookupEmailAddress(userId);
+      const userIdNamePart = getNamePartFromUserId(userId);
+      let emailAddress = lookupEmailAddress(userIdNamePart, lookupData);
       if (!emailAddress) {
-        const userName = getNamePartFromUserId(userId);
-        emailAddress = `${userName}@udk-berlin.de`;
+        emailAddress = `${userIdNamePart}@udk-berlin.de`;
       }
     };
 
@@ -79,7 +84,7 @@ export class AppModule implements OnApplicationShutdown {
       userDisplayName: string,
       roomName: string,
     ) => {
-      const emailAddress = getEmailAddressForUserId(userId);
+      const emailAddress = getEmailAddressForUserId(userId, []);
 
       const content = [
         emailIntro(userDisplayName),
@@ -101,6 +106,9 @@ export class AppModule implements OnApplicationShutdown {
       knockEventsByRoom: Record<string, KnockEvent[]>,
       childEventsByRoom: Record<string, ChildEvent[]>,
     ) => {
+      // load moderator email address lookup data
+      const lookupData = this.dataService.getEmailLookupData();
+
       // send out digest email to every moderator
       for (const modUserId of Object.keys(roomIdsByModUser)) {
         const roomIds = roomIdsByModUser[modUserId] || [];
@@ -116,7 +124,7 @@ export class AppModule implements OnApplicationShutdown {
 
         const displayName =
           await this.matrixService.getUserDisplayName(modUserId);
-        const emailAddress = getEmailAddressForUserId(modUserId);
+        const emailAddress = getEmailAddressForUserId(modUserId, lookupData);
 
         const content = [
           digestIntro(displayName),

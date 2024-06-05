@@ -38,4 +38,16 @@ export class DataService {
       this.logger.error(`Failed to write last digest timestamp: ${err}`);
     }
   }
+
+  getEmailLookupData() {
+    let lookupData = [];
+    try {
+      lookupData = JSON.parse(fs.readFileSync('spaces-export.json').toString());
+    } catch (err) {
+      this.logger.error(
+        `Failed to load moderator email address lookup data: ${err}`,
+      );
+    }
+    return lookupData;
+  }
 }
