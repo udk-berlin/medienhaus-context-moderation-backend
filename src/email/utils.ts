@@ -42,11 +42,15 @@ export function digestSummary(
       const childEvents = childEventsByRoom[roomId] || [];
       return knockEvents.length + childEvents.length > 0;
     })
-    .map((roomId) => {
+    .map((roomId, i, ids) => {
       const knockEvents = knockEventsByRoom[roomId] || [];
       const childEvents = childEventsByRoom[roomId] || [];
       const roomName = (knockEvents[0] || childEvents[0]).roomName;
-      return digestSpaceEvents(roomName, knockEvents, childEvents);
+      const result = [digestSpaceEvents(roomName, knockEvents, childEvents)];
+      if (i < ids.length - 1) {
+        result.push('');
+      }
+      return result;
     })
     .flat()
     .join('\n');
