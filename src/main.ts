@@ -13,12 +13,14 @@ async function bootstrap() {
   logger.log(`PORT: ${process.env.PORT}`);
   logger.log(`TEST_MODE: ${process.env.TEST_MODE}`);
   logger.log(`TEST_EMAIL_RECIPIENT: ${process.env.TEST_EMAIL_RECIPIENT}`);
-  logger.log(`FRONTEND_URL: ${process.env.FRONTEND_URL}`);
+  logger.log(`EMAIL_SERVER: ${process.env.EMAIL_SERVER}`);
+  logger.log(`EMAIL_USER: ${process.env.EMAIL_USER}`);
   logger.log(`MATRIX_SERVER_URL: ${process.env.MATRIX_SERVER_URL}`);
   logger.log(
     `EMAIL_DIGEST_INTERVAL_MINUTES: ${process.env.EMAIL_DIGEST_INTERVAL_MINUTES}`,
   );
   logger.log(`LAST_DIGEST_TS_FILE: ${process.env.LAST_DIGEST_TS_FILE}`);
+  logger.log(`FRONTEND_URL: ${process.env.FRONTEND_URL}`);
   logger.log('----------------------');
   logger.log(`Running on http://localhost:${process.env.PORT}`);
 

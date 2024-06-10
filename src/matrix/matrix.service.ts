@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Injectable } from '@nestjs/common';
 import * as sdk from 'matrix-js-sdk';
 import {
@@ -8,6 +7,7 @@ import {
   MatrixEvent,
   Room,
   RoomEvent,
+  SyncState,
 } from 'matrix-js-sdk';
 
 import { DataService } from '../data/data.service';
@@ -53,7 +53,7 @@ export class MatrixService {
 
     return new Promise((resolve, reject) => {
       this.client.once(ClientEvent.Sync, (state /* , prevState, res */) => {
-        if (state === 'PREPARED') {
+        if (state === SyncState.Prepared) {
           this.logger.log('Sync complete');
 
           // start listening for events
