@@ -16,8 +16,8 @@ export function digestIntro(userDisplayName: string) {
   ].join('\n');
 }
 
-export function digestOutro() {
-  return `Go to ${process.env.FRONTEND_URL} to take action.`;
+export function digestOutro(frontendUrl: string) {
+  return `Go to ${frontendUrl} to take action.`;
 }
 
 export function digestSpaceEvents(
@@ -69,4 +69,33 @@ export function knockEventAcceptedMessage(roomName: string) {
 
 export function signature() {
   return ['Best,', 'Medienhaus CMS'].join('\n');
+}
+
+export function generateKnockAcceptedEmailContent(
+  userDisplayName: string,
+  roomName: string,
+) {
+  return [
+    emailIntro(userDisplayName),
+    '',
+    knockEventAcceptedMessage(roomName),
+    '',
+    signature(),
+  ].join('\n');
+}
+
+export function generateModeratorDigestEmailContent(
+  userDisplayName: string,
+  summary: string,
+  frontendUrl: string,
+) {
+  return [
+    digestIntro(userDisplayName),
+    '',
+    summary,
+    '',
+    digestOutro(frontendUrl),
+    '',
+    signature(),
+  ].join('\n');
 }

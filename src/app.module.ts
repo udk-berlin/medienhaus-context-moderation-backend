@@ -16,14 +16,11 @@ import {
 import { getNamePartFromUserId } from './matrix/utils';
 import { lookupEmailAddress } from './utils';
 import {
-  digestEmailSubject,
-  digestIntro,
-  digestOutro,
   digestSummary,
-  emailIntro,
+  digestEmailSubject,
   knockAcceptedEmailSubject,
-  knockEventAcceptedMessage,
-  signature,
+  generateKnockAcceptedEmailContent,
+  generateModeratorDigestEmailContent,
 } from './email/utils';
 import { LookUpEntry } from './data/types';
 
@@ -85,19 +82,10 @@ export class AppModule implements OnApplicationShutdown {
       roomName: string,
     ) => {
       const emailAddress = getEmailAddressForUserId(userId, []);
-
-      const content = [
-        emailIntro(userDisplayName),
-        '',
-        knockEventAcceptedMessage(roomName),
-        '',
-        signature(),
-      ].join('\n');
-
       await this.emailService.sendEmail(
         emailAddress,
         knockAcceptedEmailSubject,
-        content,
+        generateKnockAcceptedEmailContent(userDisplayName, roomName),
       );
     };
 
@@ -125,21 +113,14 @@ export class AppModule implements OnApplicationShutdown {
         const displayName =
           await this.matrixService.getUserDisplayName(modUserId);
         const emailAddress = getEmailAddressForUserId(modUserId, lookupData);
-
-        const content = [
-          digestIntro(displayName),
-          '',
-          summary,
-          '',
-          digestOutro(),
-          '',
-          signature(),
-        ].join('\n');
-
         await this.emailService.sendEmail(
           emailAddress,
           digestEmailSubject,
-          content,
+          generateModeratorDigestEmailContent(
+            displayName,
+            summary,
+            process.env.FRONTEND_URL,
+          ),
         );
       }
     };
