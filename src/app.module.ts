@@ -75,7 +75,7 @@ export class AppModule implements OnApplicationShutdown {
       const userIdNamePart = getNamePartFromUserId(userId);
       let emailAddress = lookupEmailAddress(userIdNamePart, lookupData);
       if (!emailAddress) {
-        emailAddress = `${userIdNamePart}@udk-berlin.de`;
+        emailAddress = `${userIdNamePart}@${process.env.EMAIL_FALLBACK_DOMAIN}`;
       }
     };
 

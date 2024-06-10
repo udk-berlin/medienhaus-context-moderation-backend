@@ -42,7 +42,9 @@ export class DataService {
   getEmailLookupData() {
     let lookupData = [];
     try {
-      lookupData = JSON.parse(fs.readFileSync('spaces-export.json').toString());
+      lookupData = JSON.parse(
+        fs.readFileSync(process.env.SPACES_EXPORT_FILE).toString(),
+      );
     } catch (err) {
       this.logger.error(
         `Failed to load moderator email address lookup data: ${err}`,
