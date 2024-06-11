@@ -120,6 +120,22 @@ export class MatrixService {
     }
   }
 
+  private async getRoomName(roomId: string) {
+    try {
+      const { name } = await this.client.getStateEvent(
+        roomId,
+        'm.room.name',
+        '',
+      );
+      if (name) {
+        return name;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    return null;
+  }
+
   private async handleRoomEvent(
     event: MatrixEvent,
     knockAcceptedCallback: KnockAcceptedCallback,
@@ -172,10 +188,8 @@ export class MatrixService {
           const room = this.client.getRoom(roomId);
 
           const addedRoomId = stateKey;
-          // this returns `null` due to the bot not being in the added room(?)
-          // TODO: find workaround
-          const addedRoom = this.client.getRoom(addedRoomId);
-          const addedRoomName = addedRoom?.name || UNKNOWN;
+          const addedRoomName =
+            (await this.getRoomName(addedRoomId)) || UNKNOWN;
 
           const profile = await this.client.getProfileInfo(sender);
           const userDisplayName = profile?.displayname || UNKNOWN;
