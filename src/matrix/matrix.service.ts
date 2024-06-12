@@ -7,6 +7,7 @@ import {
   MatrixEvent,
   Room,
   RoomEvent,
+  RoomMemberEvent,
   SyncState,
 } from 'matrix-js-sdk';
 
@@ -55,6 +56,31 @@ export class MatrixService {
       this.client.once(ClientEvent.Sync, (state /* , prevState, res */) => {
         if (state === SyncState.Prepared) {
           this.logger.log('Sync complete');
+
+          // auto-accept invites of bot user to new rooms / spaces
+          this.client.on(RoomMemberEvent.Membership, async (event, member) => {
+            if (
+              member.membership === KnownMembership.Invite &&
+              member.userId === this.client.getUserId()
+            ) {
+              const roomName =
+                (await this.getRoomName(member.roomId)) || UNKNOWN;
+              this.logger.log(
+                `Bot was invited to join "${roomName}" (${member.roomId})`,
+              );
+
+              try {
+                const room = await this.client.joinRoom(member.roomId);
+                this.logger.log(
+                  `Joined room "${room.name}" (${member.roomId})`,
+                );
+              } catch (err) {
+                this.logger.error(
+                  `Failed to join room "${roomName}" (${member.roomId}): ${err}`,
+                );
+              }
+            }
+          });
 
           // start listening for events
           this.client.on(RoomEvent.Timeline, (event) =>
