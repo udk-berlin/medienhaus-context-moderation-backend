@@ -28,18 +28,20 @@ export class EmailService {
     await this.transporter.verify();
   }
 
-  async sendEmail(address: string, subject: string, content: string) {
-    const opts: Mail.Options = {
-      from: this.transportOptions.auth.user,
-      to: address,
-      subject,
-      text: content,
-    };
-    try {
-      this.logger.log(`Sending email to ${address}`);
-      return this.transporter.sendMail(opts);
-    } catch (err) {
-      this.logger.error(`Failed to send email to ${address}: ${err}`);
-    }
+  async sendEmail(addresses: string[], subject: string, content: string) {
+    addresses.forEach((address) => {
+      const opts: Mail.Options = {
+        from: this.transportOptions.auth.user,
+        to: address,
+        subject,
+        text: content,
+      };
+      try {
+        this.logger.log(`Sending email to ${address}`);
+        return this.transporter.sendMail(opts);
+      } catch (err) {
+        this.logger.error(`Failed to send email to ${address}: ${err}`);
+      }
+    });
   }
 }

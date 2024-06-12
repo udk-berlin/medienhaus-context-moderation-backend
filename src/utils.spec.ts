@@ -1,5 +1,5 @@
 import { LookUpEntry } from './data/types';
-import { lookupEmailAddress } from './utils';
+import { lookupEmailAddress, parseCommaSeparated } from './utils';
 
 describe('lookupEmailAddress()', () => {
   it('should return the matching email address and undefined otherwise', () => {
@@ -16,5 +16,13 @@ describe('lookupEmailAddress()', () => {
     const name2 = 'z.zzz';
     const result2 = lookupEmailAddress(name2, lookupData);
     expect(result2).toEqual(undefined);
+  });
+});
+
+describe('parseCommaSeparated()', () => {
+  it('should return an array', () => {
+    const input = 'a.com , b.com';
+    const result = parseCommaSeparated(input);
+    expect(result).toEqual(['a.com', 'b.com']);
   });
 });

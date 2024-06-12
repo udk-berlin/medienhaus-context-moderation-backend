@@ -14,7 +14,7 @@ import {
   KnockEvent,
 } from './matrix/types';
 import { getNamePartFromUserId } from './matrix/utils';
-import { lookupEmailAddress } from './utils';
+import { lookupEmailAddress, parseCommaSeparated } from './utils';
 import {
   digestSummary,
   digestEmailSubject,
@@ -61,19 +61,24 @@ export class AppModule implements OnApplicationShutdown {
       process.exit(1);
     });
 
-    const getEmailAddressForUserId = (
+    const getEmailAddressesForUserId = (
       userId: string,
       lookupData: LookUpEntry[],
-    ) => {
+    ): string[] => {
       if (isTestMode) {
-        return process.env.TEST_EMAIL_RECIPIENT;
+        return [process.env.TEST_EMAIL_RECIPIENT];
       }
 
       const userIdNamePart = getNamePartFromUserId(userId);
-      let emailAddress = lookupEmailAddress(userIdNamePart, lookupData);
-      if (!emailAddress) {
-        emailAddress = `${userIdNamePart}@${process.env.EMAIL_FALLBACK_DOMAIN}`;
-      }
+      const emailAddress = lookupEmailAddress(userIdNamePart, lookupData);
+      const emailAddresses: string[] = emailAddress
+        ? [emailAddress]
+        : parseCommaSeparated(process.env.EMAIL_FALLBACK_DOMAINS).map(
+          /* eslint-disable prettier/prettier */
+          (domain) => `${userIdNamePart}@${domain}`,
+        );
+      /* eslint-enable prettier/prettier */
+      return emailAddresses;
     };
 
     const knockAcceptedCallback: KnockAcceptedCallback = async (
@@ -81,9 +86,9 @@ export class AppModule implements OnApplicationShutdown {
       userDisplayName: string,
       roomName: string,
     ) => {
-      const emailAddress = getEmailAddressForUserId(userId, []);
+      const emailAddresses = getEmailAddressesForUserId(userId, []);
       await this.emailService.sendEmail(
-        emailAddress,
+        emailAddresses,
         knockAcceptedEmailSubject,
         generateKnockAcceptedEmailContent(userDisplayName, roomName),
       );
@@ -112,9 +117,12 @@ export class AppModule implements OnApplicationShutdown {
 
         const displayName =
           await this.matrixService.getUserDisplayName(modUserId);
-        const emailAddress = getEmailAddressForUserId(modUserId, lookupData);
+        const emailAddresses = getEmailAddressesForUserId(
+          modUserId,
+          lookupData,
+        );
         await this.emailService.sendEmail(
-          emailAddress,
+          emailAddresses,
           digestEmailSubject,
           generateModeratorDigestEmailContent(
             displayName,

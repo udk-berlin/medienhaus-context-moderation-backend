@@ -21,7 +21,7 @@ async function bootstrap() {
   );
   logger.log(`LAST_DIGEST_TS_FILE: ${process.env.LAST_DIGEST_TS_FILE}`);
   logger.log(`SPACES_EXPORT_FILE: ${process.env.SPACES_EXPORT_FILE}`);
-  logger.log(`EMAIL_FALLBACK_DOMAIN: ${process.env.EMAIL_FALLBACK_DOMAIN}`);
+  logger.log(`EMAIL_FALLBACK_DOMAINS: ${process.env.EMAIL_FALLBACK_DOMAINS}`);
   logger.log(`FRONTEND_URL: ${process.env.FRONTEND_URL}`);
   logger.log('----------------------');
   logger.log(`Running on http://localhost:${process.env.PORT}`);
