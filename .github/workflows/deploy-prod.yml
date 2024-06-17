@@ -45,6 +45,7 @@ jobs:
             --compress \
             --delete \
             --exclude=.env \
+            --exclude=spaces-export.json \
             --rsh="ssh -i ~/.ssh/private.key" \
             --progress \
             --verbose \
