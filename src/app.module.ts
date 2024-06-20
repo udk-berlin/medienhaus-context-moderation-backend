@@ -17,8 +17,8 @@ import { getNamePartFromUserId } from './matrix/utils';
 import { lookupEmailAddress, parseCommaSeparated } from './utils';
 import {
   digestSummary,
-  digestEmailSubject,
-  knockAcceptedEmailSubject,
+  makeDigestEmailSubject,
+  makeKnockAcceptedEmailSubject,
   generateKnockAcceptedEmailContent,
   generateModeratorDigestEmailContent,
 } from './email/utils';
@@ -38,6 +38,7 @@ export class AppModule implements OnApplicationShutdown {
   ) {
     this.logger.log('App initializing');
 
+    const emailSubjectPrefix = process.env.EMAIL_SUBJECT_PREFIX;
     const isTestMode = process.env.TEST_MODE === 'true';
     const testEmail = process.env.TEST_EMAIL_RECIPIENT;
     if (isTestMode && !testEmail) {
@@ -89,7 +90,7 @@ export class AppModule implements OnApplicationShutdown {
       const emailAddresses = getEmailAddressesForUserId(userId, []);
       await this.emailService.sendEmail(
         emailAddresses,
-        knockAcceptedEmailSubject,
+        makeKnockAcceptedEmailSubject(emailSubjectPrefix),
         generateKnockAcceptedEmailContent(userDisplayName, roomName),
       );
     };
@@ -123,7 +124,7 @@ export class AppModule implements OnApplicationShutdown {
         );
         await this.emailService.sendEmail(
           emailAddresses,
-          digestEmailSubject,
+          makeDigestEmailSubject(emailSubjectPrefix),
           generateModeratorDigestEmailContent(
             displayName,
             summary,

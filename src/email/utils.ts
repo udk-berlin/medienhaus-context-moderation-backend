@@ -1,8 +1,12 @@
 import { ChildEvent, KnockEvent } from 'src/matrix/types';
 
-const subjectPrefix = '[Medienhaus CMS]';
-export const digestEmailSubject = `${subjectPrefix} New events`;
-export const knockAcceptedEmailSubject = `${subjectPrefix} Request granted`;
+export function makeDigestEmailSubject(prefix: string) {
+  return `${prefix} New events`;
+}
+
+export function makeKnockAcceptedEmailSubject(prefix: string) {
+  return `${prefix} Request granted`;
+}
 
 export function emailIntro(userDisplayName: string) {
   return `Hello ${userDisplayName},`;

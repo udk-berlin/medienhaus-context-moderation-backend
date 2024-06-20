@@ -15,6 +15,7 @@ async function bootstrap() {
   logger.log(`TEST_EMAIL_RECIPIENT: ${process.env.TEST_EMAIL_RECIPIENT}`);
   logger.log(`EMAIL_SERVER: ${process.env.EMAIL_SERVER}`);
   logger.log(`EMAIL_USER: ${process.env.EMAIL_USER}`);
+  logger.log(`EMAIL_SUBJECT_PREFIX: ${process.env.EMAIL_SUBJECT_PREFIX}`);
   logger.log(`MATRIX_SERVER_URL: ${process.env.MATRIX_SERVER_URL}`);
   logger.log(
     `EMAIL_DIGEST_INTERVAL_MINUTES: ${process.env.EMAIL_DIGEST_INTERVAL_MINUTES}`,
