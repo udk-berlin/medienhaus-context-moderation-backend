@@ -41,7 +41,7 @@ async function listSpacesAndRooms(client: MatrixClient, rootId: string) {
 }
 
 async function listRoomJoinRules(client: MatrixClient) {
-  const rooms = await client.getRooms();
+  const rooms = client.getRooms();
   for (const room of rooms) {
     const stateEvents = room.currentState.getStateEvents('m.room.join_rules');
     const { join_rule } = stateEvents[0].getContent();
@@ -50,7 +50,7 @@ async function listRoomJoinRules(client: MatrixClient) {
 }
 
 async function makeAllRoomsPublic(client: MatrixClient) {
-  const rooms = await client.getRooms();
+  const rooms = client.getRooms();
   for (const room of rooms) {
     try {
       console.log(room.name);
@@ -62,7 +62,7 @@ async function makeAllRoomsPublic(client: MatrixClient) {
 }
 
 async function requireKnockingOnAllRooms(client: MatrixClient) {
-  const rooms = await client.getRooms();
+  const rooms = client.getRooms();
   for (const room of rooms) {
     await client.sendStateEvent(
       room.roomId,
@@ -75,7 +75,7 @@ async function requireKnockingOnAllRooms(client: MatrixClient) {
 
 async function addBotToEveryRoom(client: MatrixClient) {
   // invite bot to every room
-  const rooms = await client.getRooms();
+  const rooms = client.getRooms();
   for (const room of rooms) {
     await addUserToRoom(client, room.roomId, process.env.MATRIX_BOT_USER_ID);
   }
