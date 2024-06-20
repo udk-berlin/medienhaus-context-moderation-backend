@@ -84,7 +84,7 @@ async function addBotToEveryRoom(client: MatrixClient) {
 async function botAcceptAllInvitations() {
   // let bot accept all invitations
   const botClient = sdk.createClient({
-    baseUrl: process.env.MATRIX_SERVER_URL,
+    baseUrl: process.env.MATRIX_BASE_URL,
   });
   let res: LoginResponse;
   try {
@@ -136,7 +136,7 @@ async function main() {
   }
 
   const client = sdk.createClient({
-    baseUrl: process.env.MATRIX_SERVER_URL,
+    baseUrl: process.env.MATRIX_BASE_URL,
   });
 
   let res: LoginResponse;

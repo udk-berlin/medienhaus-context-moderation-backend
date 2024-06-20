@@ -136,7 +136,7 @@ export class AppModule implements OnApplicationShutdown {
       }
     };
 
-    this.matrixService.createClient(process.env.MATRIX_SERVER_URL);
+    this.matrixService.createClient(process.env.MATRIX_BASE_URL);
     this.matrixService
       .start(
         process.env.MATRIX_BOT_USER,
