@@ -28,10 +28,15 @@ export class EmailService {
     await this.transporter.verify();
   }
 
-  async sendEmail(addresses: string[], subject: string, content: string) {
+  async sendEmail(
+    addresses: string[],
+    subject: string,
+    content: string,
+    from?: string,
+  ) {
     addresses.forEach((address) => {
       const opts: Mail.Options = {
-        from: this.transportOptions.auth.user,
+        from: from || this.transportOptions.auth.user,
         to: address,
         subject,
         text: content,

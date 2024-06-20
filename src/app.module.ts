@@ -92,6 +92,7 @@ export class AppModule implements OnApplicationShutdown {
         emailAddresses,
         makeKnockAcceptedEmailSubject(emailSubjectPrefix),
         generateKnockAcceptedEmailContent(userDisplayName, roomName),
+        process.env.EMAIL_FROM,
       );
     };
 
@@ -130,6 +131,7 @@ export class AppModule implements OnApplicationShutdown {
             summary,
             process.env.FRONTEND_URL,
           ),
+          process.env.EMAIL_FROM,
         );
       }
     };
