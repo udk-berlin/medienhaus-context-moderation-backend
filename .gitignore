@@ -56,7 +56,7 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Development and debug scripts
-scripts
+/scripts
 
 # Matrix spaces and rooms structure export file
-*export.json
+/*-export.json
