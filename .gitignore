@@ -54,5 +54,9 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-spaces-export.json.json
+
+# Development and debug scripts
 scripts
+
+# Matrix spaces and rooms structure export file
+*export.json
