@@ -11,13 +11,14 @@ async function bootstrap() {
 
   logger.log('CONFIGURATION --------');
   logger.log(`PORT: ${process.env.PORT}`);
+  logger.log(`MATRIX_BASE_URL: ${process.env.MATRIX_BASE_URL}`);
+  logger.log(`MATRIX_BOT_USER_ID: ${process.env.MATRIX_BOT_USER_ID}`);
   logger.log(`TEST_MODE: ${process.env.TEST_MODE}`);
   logger.log(`TEST_EMAIL_RECIPIENT: ${process.env.TEST_EMAIL_RECIPIENT}`);
   logger.log(`EMAIL_SERVER: ${process.env.EMAIL_SERVER}`);
   logger.log(`EMAIL_USER: ${process.env.EMAIL_USER}`);
   logger.log(`EMAIL_FROM: ${process.env.EMAIL_FROM}`);
   logger.log(`EMAIL_SUBJECT_PREFIX: ${process.env.EMAIL_SUBJECT_PREFIX}`);
-  logger.log(`MATRIX_BASE_URL: ${process.env.MATRIX_BASE_URL}`);
   logger.log(
     `EMAIL_DIGEST_INTERVAL_MINUTES: ${process.env.EMAIL_DIGEST_INTERVAL_MINUTES}`,
   );

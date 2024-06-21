@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import * as sdk from 'matrix-js-sdk';
 import {
   ClientEvent,
-  LoginResponse,
   MatrixClient,
   MatrixEvent,
   Room,
@@ -45,12 +44,12 @@ export class MatrixService {
 
   async start(
     user: string,
-    password: string,
+    token: string,
     digestIntervalMinutes: number,
     knockAcceptedCallback: KnockAcceptedCallback,
     digestCallback: DigestCallback,
   ): Promise<void> {
-    await this.login(user, password);
+    await this.login(user, token);
 
     return new Promise((resolve, reject) => {
       this.client.once(ClientEvent.Sync, (state /* , prevState, res */) => {
@@ -135,11 +134,10 @@ export class MatrixService {
     this.client.stopClient();
   }
 
-  async login(user: string, password: string) {
-    let res: LoginResponse;
+  async login(userId: string, token: string) {
     try {
-      res = await this.client.loginWithPassword(user, password);
-      this.client.setAccessToken(res.access_token);
+      this.client.credentials = { userId };
+      this.client.setAccessToken(token);
     } catch (err) {
       this.logger.error(`Matrix login failed: ${err}`);
       throw err;

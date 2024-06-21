@@ -139,8 +139,8 @@ export class AppModule implements OnApplicationShutdown {
     this.matrixService.createClient(process.env.MATRIX_BASE_URL);
     this.matrixService
       .start(
-        process.env.MATRIX_BOT_USER,
-        process.env.MATRIX_BOT_PASSWORD,
+        process.env.MATRIX_BOT_USER_ID,
+        process.env.MATRIX_BOT_TOKEN,
         parseInt(process.env.EMAIL_DIGEST_INTERVAL_MINUTES, 10),
         knockAcceptedCallback,
         digestCallback,
