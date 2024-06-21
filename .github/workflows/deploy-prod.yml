@@ -46,6 +46,7 @@ jobs:
             --delete \
             --exclude=/.env \
             --exclude=/*-export.json \
+            --exclude=/last-digest-timestamp.txt \
             --exclude=/logs/ \
             --rsh="ssh -i ~/.ssh/private.key" \
             --progress \
