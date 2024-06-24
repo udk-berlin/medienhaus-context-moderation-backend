@@ -35,6 +35,7 @@ npm run start
 npm run start:dev
 
 # production mode
+npm run build
 npm run start:prod
 ```
 
