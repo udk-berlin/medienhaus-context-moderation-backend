@@ -57,29 +57,7 @@ export class MatrixService {
           this.logger.log('Sync complete');
 
           // auto-accept invites of bot user to new rooms / spaces
-          this.client.on(RoomMemberEvent.Membership, async (event, member) => {
-            if (
-              member.membership === KnownMembership.Invite &&
-              member.userId === this.client.getUserId()
-            ) {
-              const roomName =
-                (await this.getRoomName(member.roomId)) || UNKNOWN;
-              this.logger.log(
-                `Bot was invited to join "${roomName}" (${member.roomId})`,
-              );
-
-              try {
-                const room = await this.client.joinRoom(member.roomId);
-                this.logger.log(
-                  `Joined room "${room.name}" (${member.roomId})`,
-                );
-              } catch (err) {
-                this.logger.error(
-                  `Failed to join room "${roomName}" (${member.roomId}): ${err}`,
-                );
-              }
-            }
-          });
+          this.initAutoJoin();
 
           // start listening for events
           this.client.on(RoomEvent.Timeline, (event) =>
@@ -195,13 +173,16 @@ export class MatrixService {
             `${eventType}: ${JSON.stringify(knockEvent, null, '  ')}`,
           );
         } else if (content.membership === KnownMembership.Invite) {
-          // status changes to `invite` when knock gets accepted
-          const room = await this.client.getRoom(roomId);
-          knockAcceptedCallback(
-            stateKey,
-            content.displayname || UNKNOWN,
-            room.name,
-          );
+          const botUserId = this.client.getUserId();
+          if (stateKey !== botUserId) {
+            // status changes to `invite` when knock gets accepted
+            const room = await this.client.getRoom(roomId);
+            knockAcceptedCallback(
+              stateKey,
+              content.displayname || UNKNOWN,
+              room.name,
+            );
+          } /* else {} */
         }
         break;
 
@@ -312,5 +293,44 @@ export class MatrixService {
   async getUserDisplayName(userId: string) {
     const { displayname } = await this.client.getProfileInfo(userId);
     return displayname || UNKNOWN;
+  }
+
+  async initAutoJoin() {
+    const botUserId = this.client.getUserId()
+
+    // 1. get invites that happened while the service wasn't running
+    const invitedRoomIds = this.client
+      .getRooms()
+      .filter((room) => {
+        const member = room.getMember(botUserId);
+        return member && member.membership === KnownMembership.Invite;
+      })
+      .map((room) => room.roomId);
+    this.acceptBotInvites(invitedRoomIds);
+
+    // 2. invite events as they occur
+    this.client.on(RoomMemberEvent.Membership, async (event, member) => {
+      if (
+        member.userId === botUserId &&
+        member.membership === KnownMembership.Invite
+      ) {
+        this.acceptBotInvites([member.roomId]);
+      }
+    });
+  }
+
+  async acceptBotInvites(roomIds: string[]) {
+    for (const roomId of roomIds) {
+      const roomName = (await this.getRoomName(roomId)) || UNKNOWN;
+      this.logger.log(`Bot was invited to join "${roomName}" (${roomId})`);
+      try {
+        const room = await this.client.joinRoom(roomId);
+        this.logger.log(`Joined room "${roomName}" (${roomId})`);
+      } catch (err) {
+        this.logger.error(
+          `Failed to join room "${roomName}" (${roomId}): ${err}`,
+        );
+      }
+    }
   }
 }
