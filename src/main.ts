@@ -19,6 +19,7 @@ async function bootstrap() {
   logger.log(`EMAIL_USER: ${process.env.EMAIL_USER}`);
   logger.log(`EMAIL_FROM: ${process.env.EMAIL_FROM}`);
   logger.log(`EMAIL_SUBJECT_PREFIX: ${process.env.EMAIL_SUBJECT_PREFIX}`);
+  logger.log(`EMAIL_SIGNATURE: ${process.env.EMAIL_SIGNATURE}`);
   logger.log(
     `EMAIL_DIGEST_INTERVAL_MINUTES: ${process.env.EMAIL_DIGEST_INTERVAL_MINUTES}`,
   );
