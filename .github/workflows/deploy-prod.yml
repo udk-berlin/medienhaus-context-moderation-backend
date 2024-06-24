@@ -58,7 +58,7 @@ jobs:
         run: ssh remote 'systemctl stop medienhaus-context-moderation-backend.service'
 
       - name: Install the nodejs project
-        run: ssh remote 'cd /opt/medienhaus-context-moderation-backend/ && npm clean-install'
+        run: ssh remote 'cd /opt/medienhaus-context-moderation-backend/ && npm clean-install && npm run build --if-present'
 
       - name: Start the systemd service
         run: ssh remote 'systemctl start medienhaus-context-moderation-backend.service'
