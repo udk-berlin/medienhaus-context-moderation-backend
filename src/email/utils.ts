@@ -76,7 +76,7 @@ export function knockEventAcceptedMessage(roomName: string) {
 }
 
 export function signature() {
-  return ['Best,', 'Medienhaus CMS'].join('\n');
+  return ['-- ', process.env.EMAIL_SIGNATURE].join('\n');
 }
 
 export function generateKnockAcceptedEmailContent(
