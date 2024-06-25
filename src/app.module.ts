@@ -66,7 +66,7 @@ export class AppModule implements OnApplicationShutdown {
       userId: string,
       lookupData: LookUpEntry[],
     ): string[] => {
-      if (isTestMode) {
+      if (isTestMode || userId === process.env.MATRIX_BOT_USER_ID) {
         return [process.env.TEST_EMAIL_RECIPIENT];
       }
 
