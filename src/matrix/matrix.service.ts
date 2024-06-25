@@ -182,7 +182,7 @@ export class MatrixService {
               content.displayname || UNKNOWN,
               room.name,
             );
-          } /* else {} */
+          }
         }
         break;
 
