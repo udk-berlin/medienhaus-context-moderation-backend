@@ -296,7 +296,7 @@ export class MatrixService {
   }
 
   async initAutoJoin() {
-    const botUserId = this.client.getUserId()
+    const botUserId = this.client.getUserId();
 
     // 1. get invites that happened while the service wasn't running
     const invitedRoomIds = this.client
